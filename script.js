@@ -20,6 +20,7 @@ const rainCodes = [51,53,55,61,63,65,71,73,75,80,81,82,95,96,99];
   const today=0, tomorrow=1;
   const nowTemp=Math.round(now.temperature);
   const minTemp=Math.round(daily.temperature_2m_min[today]);
+  const nextTemp=Math.round(daily.temperature_2m_max[tomorrow]);
   const codeNow=now.weathercode;
   const codeToday=daily.weathercode[today];
   const codeTomorrow=daily.weathercode[tomorrow];
@@ -29,15 +30,17 @@ const rainCodes = [51,53,55,61,63,65,71,73,75,80,81,82,95,96,99];
   const days=["pazar","pazartesi","salı","çarşamba","perşembe","cuma","cumartesi"];
   const months=["ocak","şubat","mart","nisan","mayıs","haziran","temmuz","ağustos","eylül","ekim","kasım","aralık"];
 
+  // bugünün tarihi
   const leftDate=document.getElementById("date-left");
-  const rightDate=document.getElementById("date-right");
-
   leftDate.innerHTML=`${days[t1.getDay()]}, <span class="small">${t1.getDate()}.</span>`;
+
+  // yarının tarihi
+  const rightDate=document.getElementById("date-right");
   rightDate.innerHTML=`${t2.getDate()} ${months[t2.getMonth()]}.`;
 
-  // renk kuralı: ayın ilk/son günü
-  const lastDayOfMonth = new Date(t1.getFullYear(), t1.getMonth()+1, 0).getDate();
-  if(t1.getDate()===lastDayOfMonth) leftDate.classList.add("red");
+  // ayın başı/sonu renkleri
+  const lastDay = new Date(t1.getFullYear(), t1.getMonth()+1, 0).getDate();
+  if(t1.getDate()===lastDay) leftDate.classList.add("red");
   if(t1.getDate()===1) leftDate.classList.add("green");
   if(t2.getDate()===1) rightDate.classList.add("green");
 
@@ -45,11 +48,11 @@ const rainCodes = [51,53,55,61,63,65,71,73,75,80,81,82,95,96,99];
   document.getElementById("temp-now").textContent=`${nowTemp}°`;
   const minEl=document.getElementById("temp-min");
   minEl.textContent=`${minTemp}°`;
-
   document.getElementById("icon-today").textContent=iconMap[codeNow]||"❓";
   document.getElementById("icon-next").textContent=iconMap[codeTomorrow]||"❓";
+  document.getElementById("temp-next").textContent=`${nextTemp}°`;
 
-  // düşük sıcaklık rengi kuralı
+  // düşük sıcaklık rengi (hava durumu değişimi)
   const eveningCode = hourly.weathercode.slice(18,24).find(c=>c);
   const nowRain = rainCodes.includes(codeNow) || rainCodes.includes(codeToday);
   const eveningRain = rainCodes.includes(eveningCode);
