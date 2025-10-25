@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- (c) ammap.com | Modified with glow + sparkle by ChatGPT -->
+<svg
+    version="1.1"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    width="64"
+    height="64"
+    viewBox="0 0 64 64">
+
+  <defs>
+    <filter id="blur" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dx="0" dy="4" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.05"/>
+      </feComponentTransfer>
+      <feMerge> 
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/> 
+      </feMerge>
+    </filter>
+
+    <style type="text/css"><![CDATA[
+
+/* --------------------
+   CLOUD ANIMATION
+-------------------- */
+@keyframes am-weather-cloud-2 {
+  0% { transform: translate(0,0); }
+  50% { transform: translate(2px,0); }
+  100% { transform: translate(0,0); }
+}
+.am-weather-cloud-2 {
+  animation: am-weather-cloud-2 3s linear infinite;
+}
+
+/* --------------------
+   SNOW ANIMATION
+-------------------- */
+@keyframes am-weather-snow {
+  0% { transform: translateX(0) translateY(0); opacity: 1; }
+  33% { transform: translateX(-1.2px) translateY(2px); }
+  66% { transform: translateX(1.4px) translateY(4px); }
+  100% { transform: translateX(-1.6px) translateY(6px); opacity: 0; }
+}
+@keyframes am-weather-snow-reverse {
+  0% { transform: translateX(0) translateY(0); opacity: 1; }
+  33% { transform: translateX(1.2px) translateY(2px); }
+  66% { transform: translateX(-1.4px) translateY(4px); }
+  100% { transform: translateX(1.6px) translateY(6px); opacity: 0; }
+}
+.am-weather-snow-1 {
+  animation: am-weather-snow 2s linear infinite;
+}
+.am-weather-snow-2 {
+  animation: am-weather-snow 2s linear infinite;
+  animation-delay: 1.2s;
+}
+.am-weather-snow-3 {
+  animation: am-weather-snow-reverse 2s linear infinite;
+}
+
+/* --------------------
+   GLOW (parıltı)
+-------------------- */
+@keyframes snowGlow {
+  0%,100% { filter: drop-shadow(0 0 0px #fff); opacity: 0.8; }
+  50% { filter: drop-shadow(0 0 6px #fff); opacity: 1; }
+}
+.snowflake line {
+  animation: snowGlow 2.5s ease-in-out infinite;
+}
+
+/* --------------------
+   SPARKLES ✨
+-------------------- */
+@keyframes sparkle {
+  0% { opacity: 0; transform: scale(0.5); }
+  50% { opacity: 1; transform: scale(1.2); }
+  100% { opacity: 0; transform: scale(0.5); }
+}
+.spark {
+  fill: #fff8a8;
+  opacity: 0;
+  animation: sparkle 2s ease-in-out infinite;
+}
+.sparkles .spark:nth-child(2){ animation-delay: 1s; }
+.sparkles .spark:nth-child(3){ animation-delay: 1.8s; }
+
+    ]]></style>
+  </defs>
+
+  <g filter="url(#blur)" id="snowy-6">
+    <g transform="translate(20,10)">
+      <g class="am-weather-cloud-2">
+        <path d="M47.7,35.4c0-4.6-3.7-8.2-8.2-8.2c-1,0-1.9,0.2-2.8,0.5c-0.3-3.4-3.1-6.2-6.6-6.2
+        c-3.7,0-6.7,3-6.7,6.7c0,0.8,0.2,1.6,0.4,2.3
+        c-0.3-0.1-0.7-0.1-1-0.1c-3.7,0-6.7,3-6.7,6.7
+        c0,3.6,2.9,6.6,6.5,6.7l17.2,0
+        C44.2,43.3,47.7,39.8,47.7,35.4z"
+        fill="#767b8d" stroke="#767b8d" stroke-linejoin="round" stroke-width="1.2" transform="translate(-20,-11)"/>
+      </g>
+
+      <g class="am-weather-snow-1 snowflake">
+        <g transform="translate(3,28)">
+          <line stroke="red" stroke-linecap="round" stroke-width="1.2" transform="translate(0,9) rotate(0)" x1="0" x2="0" y1="-2.5" y2="2.5"/>
+          <line stroke="red" stroke-linecap="round" stroke-width="1" transform="translate(0,9) rotate(45)" x1="0" x2="0" y1="-2.5" y2="2.5"/>
+          <line stroke="red" stroke-linecap="round" stroke-width="1" transform="translate(0,9) rotate(90)" x1="0" x2="0" y1="-2.5" y2="2.5"/>
+          <line stroke="red" stroke-linecap="round" stroke-width="1" transform="translate(0,9) rotate(135)" x1="0" x2="0" y1="-2.5" y2="2.5"/>
+        </g>
+      </g>
+
+      <g class="am-weather-snow-2 snowflake">
+        <g transform="translate(11,28)">
+          <line stroke="red" stroke-linecap="round" stroke-width="1.2" transform="translate(0,9) rotate(0)" x1="0" x2="0" y1="-2.5" y2="2.5"/>
+          <line stroke="red" stroke-linecap="round" stroke-width="1" transform="translate(0,9) rotate(45)" x1="0" x2="0" y1="-2.5" y2="2.5"/>
+          <line stroke="red" stroke-linecap="round" stroke-width="1" transform="translate(0,9) rotate(90)" x1="0" x2="0" y1="-2.5" y2="2.5"/>
+          <line stroke="red" stroke-linecap="round" stroke-width="1" transform="translate(0,9) rotate(135)" x1="0" x2="0" y1="-2.5" y2="2.5"/>
+        </g>
+      </g>
+
+      <g class="am-weather-snow-3 snowflake">
+        <g transform="translate(20,28)">
+          <line stroke="red" stroke-linecap="round" stroke-width="1.2" transform="translate(0,9) rotate(0)" x1="0" x2="0" y1="-2.5" y2="2.5"/>
+          <line stroke="red" stroke-linecap="round" stroke-width="1" transform="translate(0,9) rotate(45)" x1="0" x2="0" y1="-2.5" y2="2.5"/>
+          <line stroke="red" stroke-linecap="round" stroke-width="1" transform="translate(0,9) rotate(90)" x1="0" x2="0" y1="-2.5" y2="2.5"/>
+          <line stroke="red" stroke-linecap="round" stroke-width="1" transform="translate(0,9) rotate(135)" x1="0" x2="0" y1="-2.5" y2="2.5"/>
+        </g>
+      </g>
+    </g>
+  </g>
+
+</svg>

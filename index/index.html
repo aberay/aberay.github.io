@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>İzmit Hava (Panel V6 - Son Düzeltmeler + Piyasa)</title>
+<style>
+@font-face {
+  font-family: 'Dotmatri';
+  src: url('DOTMATRI.TTF') format('truetype');
+  font-display: swap;
+}
+
+body {
+  margin: 0;
+  background: #000000;
+  color: #f3f3f3;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  font-size: 13px;
+  text-transform: lowercase;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  gap: 40px;
+}
+
+/* --- YUKARI SATIR: HAVA + PİYASA yan yana --- */
+#topRow {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+/* BAR (hava) */
+#bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 260px;
+  height: 58px;
+  padding: 6px 12px 4px;
+  box-sizing: border-box;
+  border-radius: 5px;
+  background: #1d1d1d;
+}
+
+.right {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  padding-top: 2px;
+  padding-right: 100px;
+  margin-left: 10px;
+}
+
+.date-top {
+  font-size: 11.5px;
+  line-height: 1.1;
+  opacity: 0.9;
+  margin-left: 13px;
+  text-align: center;
+}
+.date-top .small {
+  font-size: 11px;
+  opacity: 1;
+}
+.date-top.red .small { color: #ff0000; }
+.date-top.green .small { color: #4fc03e; }
+.date-top.red, .date-top.green { color: inherit; }
+.dot { color: #f3f3f3; }
+
+.weather-today {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 1px;
+  height: 36px;
+}
+
+.icon img {
+  width: 40px;
+  height: 40px;
+  vertical-align: left;
+}
+
+.temp {
+  font-weight: 500;
+  font-size: 13px;
+  color: #f3f3f3;
+}
+
+.temp-min {
+  font-size: 11px;
+  opacity: 0.7;
+  font-style: italic;
+}
+
+.temp-min.red { color: #ff4c4c; opacity: 1; }
+.temp-min.green { color: #4fc03e; opacity: 1; }
+
+.next-top {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 3px;
+  height: 32px;
+  margin-top: -5px;
+}
+
+.next-date {
+  font-size: 12px;
+  opacity: 0.85;
+  text-align: center;
+  font-style: italic;
+  margin-right: 45px;
+  padding-bottom: 5px;
+  margin-bottom: 5px;
+}
+.next-date .small {
+  font-size: 11px;
+  opacity: 1;
+}
+.next-date.green { color: #4fc03e; }
+
+
+/* yazı kırmızı, özel font sadece piyasa kısmına uygulanır */
+
+.marketBox .value {
+  display: block;
+  font-size: 15px;
+  color: #c7c7c7;
+  font-weight: 600;
+  font-family: 'Dotmatri', Inter, sans-serif;
+}
+
+/* küçük uyarı/istatistik alt satırı */
+.marketBox .sub {
+  display: block;
+  font-size: 11px;
+  color: #ff4c4c;
+  opacity: 0.8;
+  margin-top: 4px;
+  font-family: 'Dotmatri', Inter, sans-serif;
+}
+
+/* responsive: dar ekranda üst üste düşsün */
+@media (max-width: 420px) {
+  #topRow { flex-direction: column; align-items: center; }
+}
+
+/* PANEL */
+#panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  background: #2b2b2b;
+  border-radius: 12px;
+  padding: 20px 25px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  width: 320px;
+}
+
+/* PİYASA KUTUSU (SAĞDA) */
+.marketWrap {
+  display: flex;
+  flex-direction: row;
+  gap: 60px;
+  align-items: flex-end;
+  /* bar ile aynı hizada durması için min-height */
+  min-height: 58px;
+    margin-left: 8px;
+}
+
+/* kutucuk: sadece yazının arkası siyah olacak */
+.marketBox {
+  background: #333333; /* siyah kutucuk */
+  padding: 4px 5px;
+  border-radius: 3px;
+  display: inline-block;
+  box-sizing: border-box;
+  min-width: 30px;
+  text-align: center;
+  box-shadow: 0 0px 0px rgba(0,0,0,0.6);
+  
+}
+
+</style>
+</head>
+<body>
+
+<div id="topRow">
+  <div id="bar">
+    <div class="left">
+      <div class="date-top" id="date-left">bugün</div>
+      <div class="weather-today">
+        <span class="icon" id="icon-today"><img src="sunny.svg" alt="hava"></span>
+        <span class="temp" id="temp-now">--°</span>
+        <span class="temp-min" id="temp-min">--°</span>
+      </div>
+    </div>
+    <div class="right">
+      <div class="next-top">
+        <span class="icon" id="icon-next"><img src="cloudy.svg" alt="hava"></span>
+        <span class="temp" id="temp-next">--°</span>
+        <span class="temp-min" id="temp-next-min">--°</span>
+
+        <!-- 📊 PİYASA KUTUSU artık sağ hava durumunun yanında -->
+        <div class="marketWrap" aria-hidden="false">
+          <div class="marketBox" id="marketBox">
+            <span class="value" id="usdValue">--,--</span>
+            <span class="value" id="goldValue">--</span>
+          </div>
+        </div>
+      </div>
+      <div class="next-date" id="date-right">yarın</div>
+    </div>
+  </div>
+
+</div>
+
+<div id="panel">
+  <!-- (panel içeriği aynen korundu) -->
+  <div>
+    <label for="dateInput">Bugünün Tarihi:</label>
+    <input type="date" id="dateInput">
+  </div>
+
+  <div>
+    <label for="timeInput">Saat:</label>
+    <input type="time" id="timeInput" value="12:00">
+  </div>
+
+  <div>
+    <label for="weatherInput">Şu Anki Hava Durumu:</label>
+    <select id="weatherInput">
+      <option value="sunny">Güneşli</option>
+      <option value="cloudy sun">Parçalı bulutlu</option>
+      <option value="cloudy">Bulutlu</option>
+      <option value="rain and sun">Güneşli yağmurlu</option>
+      <option value="rain">Yağmurlu</option>
+      <option value="snowy">Karlı</option>
+      <option value="fog">Sisli</option>
+    </select>
+  </div>
+
+  <div>
+    <label for="nextWeather">Sonraki Hava Durumu:</label>
+    <select id="nextWeather">
+      <option value="sunny">Güneşli</option>
+      <option value="cloudy sun">Parçalı bulutlu</option>
+      <option value="cloudy">Bulutlu</option>
+      <option value="rain">Yağmurlu</option>
+      <option value="snowy">Karlı</option>
+      <option value="fog">Sisli</option>
+    </select>
+  </div>
+
+  <div>
+    <label for="tempNow">Şu Anki Sıcaklık (°C):</label>
+    <input type="number" id="tempNow" placeholder="örnek: 8">
+  </div>
+
+  <div>
+    <label for="tempMin">En Düşük Sıcaklık (°C):</label>
+    <input type="number" id="tempMin" placeholder="örnek: 8">
+  </div>
+
+  <div>
+    <label for="tempMax">En Yüksek Sıcaklık (°C):</label>
+    <input type="number" id="tempMax" placeholder="örnek: 15">
+  </div>
+
+  <hr style="width:100%; border:0; border-top:1px solid #444; margin: 5px 0;">
+
+  <div>
+    <label for="tomorrowWeather">Yarının Hava Durumu:</label>
+    <select id="tomorrowWeather">
+      <option value="sunny">Güneşli</option>
+      <option value="cloudy sun">Parçalı bulutlu</option>
+      <option value="cloudy">Bulutlu</option>
+      <option value="rain">Yağmurlu</option>
+      <option value="snowy">Karlı</option>
+      <option value="fog">Sisli</option>
+    </select>
+  </div>
+
+  <div>
+    <label for="tempNext">Yarın En Yüksek (°C):</label>
+    <input type="number" id="tempNext" placeholder="örnek: 20">
+  </div>
+
+  <div>
+    <label for="tempNextMin">Yarın En Düşük (°C):</label>
+    <input type="number" id="tempNextMin" placeholder="örnek: 12">
+  </div>
+
+  <button onclick="updateWeather()">Güncelle</button>
+</div>
+
+<script>
+// (Mevcut updateWeather fonksiyonu aynen korunuyor - orijinal koddaki fonksiyonu buraya yapıştırın veya çağırın)
+function updateWeather() {
+  const dateVal = document.getElementById("dateInput").value;
+  const timeVal = document.getElementById("timeInput").value;
+  const weatherNow = document.getElementById("weatherInput").value;
+  const weatherNext = document.getElementById("nextWeather").value;
+  const tempNow = parseFloat(document.getElementById("tempNow").value);
+  const tempMin = parseFloat(document.getElementById("tempMin").value);
+  const tempMax = parseFloat(document.getElementById("tempMax").value);
+  const tomorrowWeather = document.getElementById("tomorrowWeather").value;
+  const tempNext = document.getElementById("tempNext").value;
+  const tempNextMin = document.getElementById("tempNextMin").value;
+
+  const days = ["pazar","pazartesi","salı","çarşamba","perşembe","cuma","cumartesi"];
+  const months = ["ocak","şubat","mart","nisan","mayıs","haziran","temmuz","ağustos","eylül","ekim","kasım","aralık"];
+
+  if (dateVal) {
+    const d = new Date(dateVal);
+    const today = d.getDate();
+    const monthDays = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+
+    const tomorrow = new Date(d);
+    tomorrow.setDate(today + 1);
+
+    const dateLeft = document.getElementById("date-left");
+    dateLeft.className = "date-top";
+    if (today === 1) dateLeft.classList.add("green");
+    if (today === monthDays) dateLeft.classList.add("red");
+
+    dateLeft.innerHTML = `${days[d.getDay()]}, <span class="small">${today}</span><span class="dot">.</span>`;
+
+    const dateRight = document.getElementById("date-right");
+    const nextMonth = (today === monthDays);
+    dateRight.className = "next-date";
+    if (nextMonth) dateRight.classList.add("green");
+    dateRight.innerHTML = `<span class="small">${tomorrow.getDate()}</span> ${months[tomorrow.getMonth()]}.`;
+  }
+
+  let hour = 12;
+  if (timeVal) {
+    hour = parseInt(timeVal.split(":")[0]);
+  }
+
+  const isNight = hour >= 19 || hour < 6;
+
+  let todayIcon = "";
+  let tomorrowIcon = "";
+
+  switch (weatherNow) {
+    case 'sunny':
+      todayIcon = isNight ? 'night.svg' : 'sunny.svg';
+      break;
+    case 'cloudy sun':
+      todayIcon = isNight ? 'cloudy night.svg' : 'cloudy sun.svg';
+      break;
+    case 'rain and sun':
+      todayIcon = isNight ? 'rain and night.svg' : 'rain and sun.svg';
+      break;
+    case 'rain':
+      todayIcon = isNight ? 'rain and night.svg' : 'rain.svg';
+      break;
+    case 'snowy':
+      todayIcon = isNight ? 'snowy night.svg' : 'snowy.svg';
+      break;
+    case 'cloudy':
+      todayIcon = isNight ? 'cloudy night.svg' : 'cloudy.svg';
+      break;
+    case 'fog':
+      todayIcon = isNight ? 'cloudy night.svg' : 'cloudy.svg';
+      break;
+    default:
+      todayIcon = 'sunny.svg';
+  }
+
+  switch (tomorrowWeather) {
+    case 'fog':
+      tomorrowIcon = 'cloudy.svg';
+      break;
+    default:
+      tomorrowIcon = `${tomorrowWeather}.svg`;
+  }
+
+  document.getElementById("icon-today").innerHTML = `<img src="${todayIcon}" alt="${weatherNow}">`;
+  document.getElementById("icon-next").innerHTML = `<img src="${tomorrowIcon}" alt="${tomorrowWeather}">`;
+
+  const tempNowEl = document.getElementById("temp-now");
+  const tempMinEl = document.getElementById("temp-min");
+
+  tempNowEl.textContent = isNaN(tempNow) ? "--°" : `${tempNow}°`;
+  tempMinEl.textContent = isNaN(tempMin) ? "--°" : `${tempMin}°`;
+  document.getElementById("temp-next").textContent = tempNext ? `${tempNext}°` : "--°";
+  document.getElementById("temp-next-min").textContent = tempNextMin ? `${tempNextMin}°` : "--°";
+
+  tempMinEl.className = "temp-min";
+
+  const precip = ["rain", "snowy"];
+  const isPrecipNow = precip.includes(weatherNow);
+  const isPrecipNext = precip.includes(weatherNext);
+
+  if (!isNaN(tempNow) && !isNaN(tempMin) && tempNow === tempMin) {
+    tempMinEl.classList.add("red");
+  }
+  else if (!isPrecipNow && isPrecipNext) {
+    tempMinEl.classList.add("red");
+  }
+  else if (isPrecipNow && !isPrecipNext) {
+    tempMinEl.classList.add("green");
+  }
+}
+
+// --- Otomatik hava (Open-Meteo) ---
+const LAT = 40.7667, LON = 29.9167; // İzmit koordinatları
+
+async function loadWeatherFromAPI() {
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current_weather=true&daily=sunrise,sunset,temperature_2m_min,temperature_2m_max,weathercode&timezone=auto&forecast_days=2`;
+    const r = await fetch(url);
+    const d = await r.json();
+
+    const now = d.current_weather;
+    const daily = d.daily;
+    const today = 0;
+    const tomorrow = 1;
+
+    document.getElementById("tempNow").value = Math.round(now.temperature);
+    document.getElementById("tempMin").value = Math.round(daily.temperature_2m_min[today]);
+    document.getElementById("tempMax").value = Math.round(daily.temperature_2m_max[today]);
+    document.getElementById("tempNext").value = Math.round(daily.temperature_2m_max[tomorrow]);
+    document.getElementById("tempNextMin").value = Math.round(daily.temperature_2m_min[tomorrow]);
+
+    function getWeatherName(code) {
+      if ([0, 1].includes(code)) return "sunny";
+      if ([2].includes(code)) return "cloudy sun";
+      if ([3, 45, 48].includes(code)) return "cloudy";
+      if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) return "rain";
+      if ([71, 73, 75].includes(code)) return "snowy";
+      if ([95, 96, 99].includes(code)) return "rain";
+      return "sunny";
+    }
+
+    const codeNow = now.weathercode;
+    const codeTomorrow = daily.weathercode[tomorrow];
+
+    document.getElementById("weatherInput").value = getWeatherName(codeNow);
+    document.getElementById("tomorrowWeather").value = getWeatherName(codeTomorrow);
+    document.getElementById("nextWeather").value = getWeatherName(codeTomorrow);
+
+    const t = new Date(daily.time[today]);
+    document.getElementById("dateInput").value = t.toISOString().split("T")[0];
+    document.getElementById("timeInput").value = new Date().toTimeString().slice(0,5);
+
+    updateWeather();
+
+  } catch (err) {
+    console.error("API'den veri çekilemedi:", err);
+  }
+}
+
+async function fetchMarket() {
+  const usdEl = document.getElementById("usdValue");
+  const goldEl = document.getElementById("goldValue");
+
+  // 🧩 DEFAULT DEĞERLER (sayfa açılır açılmaz gösterilecek)
+  let usdTry = 34.50;
+  let gramGold = 2550;
+
+  // ekrana hemen varsayılanı bas
+  usdEl.textContent = usdTry.toLocaleString("tr-TR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+  goldEl.textContent = gramGold.toLocaleString("tr-TR", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  });
+
+  try {
+    const FXR_KEY = "fxr_live_14c89a1b7ce27e427f440f545e64f2b3600d";
+    const res = await fetch(`https://api.fxratesapi.com/latest?base=USD&currencies=TRY,XAU&format=json&apikey=${FXR_KEY}`);
+    const data = await res.json();
+
+    if (!data.success || !data.rates) throw new Error("API başarısız yanıt verdi");
+
+    usdTry = parseFloat(data.rates.TRY);
+    const xauUsd = parseFloat(data.rates.XAU);
+    const xauPerUsd = 1 / xauUsd;
+    gramGold = (xauPerUsd * usdTry) / 31.1035;
+
+    // Güncel veriyi yaz
+    usdEl.textContent = usdTry.toLocaleString("tr-TR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+    goldEl.textContent = Math.round(gramGold).toLocaleString("tr-TR", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    });
+
+  } catch (err) {
+    console.error("FXRatesAPI hata:", err);
+  }
+}
+
+
+
+
+// Sayfa yüklenince çalışsın
+window.addEventListener("DOMContentLoaded", () => {
+  loadWeatherFromAPI();
+  fetchMarket();
+  // opsiyonel: her 60 saniyede güncelle
+  setInterval(fetchMarket, 60_000);
+});
+</script>
+</body>
+</html>
