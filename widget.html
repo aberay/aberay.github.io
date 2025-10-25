@@ -1,63 +1,139 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>İzmit Hava Durumu - Mini Widget</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>İzmit Hava</title>
+<style>
+body {
+  margin: 0;
+  background: #1d1d1d;
+  color: #f3f3f3;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-size: 13px;
+  text-transform: lowercase;
+}
+#bar {
+  height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+.date, .next-date {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  white-space: nowrap;
+}
+.date span.small,
+.next-date span.small {
+  font-size: 10px;
+  opacity: 0.8;
+}
+.center {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.icon {
+  font-size: 20px;
+  line-height: 1;
+}
+.temp {
+  font-weight: 500;
+  color: #f3f3f3;
+}
+.temp-min {
+  font-size: 12px;
+  opacity: 0.6;
+}
+.temp-min.red { color: #ff4c4c; opacity: 1; }
+.temp-min.green { color: #4fc03e; opacity: 1; }
+.next-date.green { color: #4fc03e; }
+.date.red span.small { color: #ff4c4c; }
+.date.green span.small { color: #4fc03e; }
+</style>
 </head>
 <body>
-  <div id="weather-widget" aria-live="polite">
-    <div class="top-row">
-      <div class="date-top" id="date-top">Yükleniyor...</div>
-      <div class="location">İzmit</div>
-    </div>
-
-    <div class="cards">
-      <!-- Current -->
-      <div class="card current">
-        <div class="card-header">
-          <div class="day-name" id="current-day">--</div>
-          <div class="day-date" id="current-date">--</div>
-        </div>
-
-        <div class="card-body">
-          <div class="icon" id="current-icon">☀️</div>
-          <div class="temps">
-            <div class="current-temp" id="current-temp">--°</div>
-            <div class="min-max">
-              <span class="label">Gün:</span>
-              <span id="current-max">--°</span>
-              <span id="current-min">--°</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Next day -->
-      <div class="card next">
-        <div class="card-header">
-          <div class="day-name" id="next-day">--</div>
-          <div class="day-date" id="next-date">--</div>
-        </div>
-
-        <div class="card-body">
-          <div class="icon" id="next-icon">🌤️</div>
-          <div class="temps">
-            <div class="current-temp small" id="next-temp">--°</div>
-            <div class="min-max">
-              <span class="label">Gün:</span>
-              <span id="next-max">--°</span>
-              <span id="next-min">--°</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="footer" id="footer">Veriler Open-Meteo üzerinden çekildi</div>
+<div id="bar">
+  <div class="date" id="date-left"><span>yükleniyor</span></div>
+  <div class="center">
+    <span class="icon" id="icon">☀️</span>
+    <span class="temp" id="temp-now">--°</span>
+    <span class="temp-min" id="temp-min">--°</span>
   </div>
+  <div class="next-date" id="date-right">--</div>
+</div>
 
-  <script src="script.js"></script>
+<script>
+const LAT = 40.7667, LON = 29.9167;
+
+const iconMap = {
+  0:"☀️",1:"🌤️",2:"⛅",3:"☁️",45:"🌫️",48:"🌫️",
+  51:"🌦️",53:"🌧️",55:"🌧️",61:"🌧️",63:"🌧️",
+  65:"🌧️",71:"🌨️",73:"🌨️",75:"🌨️",80:"🌦️",
+  81:"🌧️",82:"🌧️",95:"⛈️",96:"⛈️",99:"⛈️"
+};
+
+const rainCodes = [51,53,55,61,63,65,71,73,75,80,81,82,95,96,99];
+
+(async()=>{
+  const url=`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current_weather=true&hourly=weathercode&daily=temperature_2m_min,temperature_2m_max,weathercode&timezone=auto`;
+  const r=await fetch(url);const d=await r.json();
+
+  const now=d.current_weather;
+  const daily=d.daily;
+  const hourly=d.hourly;
+
+  const today=0, tomorrow=1;
+  const nowTemp=Math.round(now.temperature);
+  const minTemp=Math.round(daily.temperature_2m_min[today]);
+  const codeNow=now.weathercode;
+  const codeToday=daily.weathercode[today];
+  const codeTomorrow=daily.weathercode[tomorrow];
+  
+  // Tarihler
+  const t1=new Date(daily.time[today]);
+  const t2=new Date(daily.time[tomorrow]);
+  const days=["pazar","pazartesi","salı","çarşamba","perşembe","cuma","cumartesi"];
+  const months=["ocak","şubat","mart","nisan","mayıs","haziran","temmuz","ağustos","eylül","ekim","kasım","aralık"];
+
+  const left=document.getElementById("date-left");
+  const right=document.getElementById("date-right");
+
+  left.innerHTML=`${days[t1.getDay()]}, <span class="small">${t1.getDate()}.</span>`;
+  right.innerHTML=`<span class="small">${t2.getDate()} ${months[t2.getMonth()]}.</span>`;
+
+  // renk kuralı: bugün ayın son günü ise kırmızı
+  const nextMonth = new Date(t1);
+  nextMonth.setMonth(t1.getMonth()+1,0); // ayın son günü
+  if(t1.getDate()===nextMonth.getDate()) left.classList.add("red");
+  // bugün ayın ilk günü ise yeşil
+  if(t1.getDate()===1) left.classList.add("green");
+  // ertesi gün ayın ilk günü ise next-date yeşil
+  if(t2.getDate()===1) right.classList.add("green");
+
+  // sıcaklıklar
+  document.getElementById("temp-now").textContent=`${nowTemp}°`;
+  const minEl=document.getElementById("temp-min");
+  minEl.textContent=`${minTemp}°`;
+
+  // hava durumu ikonu
+  document.getElementById("icon").textContent=iconMap[codeNow]||"❓";
+
+  // düşük sıcaklık rengi kuralı:
+  // sabah yağmurlu -> akşam yağmur yok => yeşil
+  // bugün yağmurlu değil -> akşam yağmur başlıyorsa => kırmızı
+  // bugün de akşam da yağmurluysa -> gri (default)
+  const eveningCode = hourly.weathercode.slice(18,24).find(c=>c); // akşam tahmini
+  const nowIsRain = rainCodes.includes(codeNow) || rainCodes.includes(codeToday);
+  const eveningIsRain = rainCodes.includes(eveningCode);
+  if(nowIsRain && !eveningIsRain) minEl.classList.add("green");
+  else if(!nowIsRain && eveningIsRain) minEl.classList.add("red");
+
+})();
+</script>
 </body>
 </html>
