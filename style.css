@@ -57,6 +57,13 @@ body {
 .temp-min.red { color: #ff4c4c; opacity: 1; }
 .temp-min.green { color: #4fc03e; opacity: 1; }
 
+.next-top {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 5px;
+}
+
 .next-date {
   font-size: 12px;
   opacity: 0.8;
